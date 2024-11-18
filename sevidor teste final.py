@@ -1,6 +1,5 @@
 import socket
 import select
-
 class ChatServer:
     def __init__(self, host='127.0.0.1', port=200):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,7 +11,6 @@ class ChatServer:
         print("Comandos disponíveis:")
         print("/p usuario - inicia chat privado")
         print("/sair - sai do chat privado")
-
     def broadcast(self, message, sender=None):
         print(f"Broadcast: {message}")
         for client in self.clients:
@@ -21,7 +19,6 @@ class ChatServer:
                     client.send(message.encode())
                 except:
                     self.remove_client(client)
-
     def send_private(self, sender, target_username, message):
         for client, username in self.clients.items():
             if username == target_username:
@@ -32,7 +29,6 @@ class ChatServer:
                 except:
                     self.remove_client(client)
         return False
-
     def remove_client(self, client):
         if client in self.clients:
             username = self.clients[client]
@@ -41,10 +37,9 @@ class ChatServer:
                 del self.private_chats[client]
             client.close()
             self.broadcast(f"{username} saiu do chat!")
-
-    def process_command(self, client, message):
+def process_command(self, client, message):
         if message.startswith('/p '):
-            # Comando para chat privado
+            # Comando para chat privado lembar arthur
             try:
                 target = message.split()[1]
                 if target in [username for username in self.clients.values()]:
@@ -54,25 +49,21 @@ class ChatServer:
                     client.send("Usuário não encontrado.".encode())
             except:
                 client.send("Uso: /p usuario".encode())
-        
         elif message == '/sair':
-            # Sair do chat privado
+            # Sair do chat privado lembre arthur
             if client in self.private_chats:
                 target = self.private_chats[client]
                 del self.private_chats[client]
                 client.send(f"Saiu do chat privado com {target}".encode())
             else:
                 client.send("Você não está em um chat privado.".encode())
-        
         else:
             return False
         return True
-
-    def run(self):
+def run(self):
         while True:
             try:
                 readable, _, _ = select.select([self.server] + list(self.clients.keys()), [], [], 0.1)
-                
                 for sock in readable:
                     if sock == self.server:
                         client, addr = self.server.accept()
@@ -81,7 +72,6 @@ class ChatServer:
                         print(f"Novo cliente: {username}")
                         self.broadcast(f"{username} entrou no chat!")
                         client.send("Comandos: /p usuario (chat privado), /sair (sair do privado)".encode())
-                        
                     else:
                         try:
                             message = sock.recv(1024).decode().strip()
@@ -104,7 +94,6 @@ class ChatServer:
                             self.remove_client(sock)
             except Exception as e:
                 print(f"Erro no servidor: {str(e)}")
-
 if __name__ == "__main__":
     server = ChatServer()
     server.run()
